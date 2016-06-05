@@ -32,7 +32,7 @@ func tokenToString(token *Token) (output string) {
 	for _, s := range token.segments {
 		output += tokenToString(s.token)
 	}
-	output += fmt.Sprintf("%s/%s ", textSliceToString(token.text), token.pos)
+	output += fmt.Sprintf("%s/%s ", textSliceToString(token.text), token.frequency)
 	return
 }
 

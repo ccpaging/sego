@@ -26,17 +26,16 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/huichen/sego"
 	"io"
-	"log"
 	"net/http"
 	"runtime"
+	"github.com/huichen/sego"
 )
 
 var (
 	host      = flag.String("host", "", "HTTP服务器主机名")
 	port      = flag.Int("port", 8080, "HTTP服务器端口")
-	dict      = flag.String("dict", "../data/dictionary.txt", "词典文件")
+	dict      = flag.String("dict", "data/dictionary.txt", "词典文件")
 	staticFolder = flag.String("static_folder", "static", "静态页面存放的目录")
 	segmenter = sego.Segmenter{}
 )
@@ -80,8 +79,16 @@ func main() {
 	// 初始化分词器
 	segmenter.LoadDictionary(*dict)
 
-	http.HandleFunc("/json", JsonRpcServer)
-	http.Handle("/", http.FileServer(http.Dir(*staticFolder)))
-	log.Print("服务器启动")
-	http.ListenAndServe(fmt.Sprintf("%s:%d", *host, *port), nil)
+	// 分词
+	text := []byte("加微信号要不要")
+	segments := segmenter.Segment(text)
+
+	// 处理分词结果
+	// 支持普通模式和搜索模式两种分词，见代码中SegmentsToString函数的注释。
+	fmt.Println(sego.SegmentsToString(segments, false))
+
+	//http.HandleFunc("/json", JsonRpcServer)
+	//http.Handle("/", http.FileServer(http.Dir(*staticFolder)))
+	//log.Print("服务器启动")
+	//http.ListenAndServe(fmt.Sprintf("%s:%d", *host, *port), nil)
 }

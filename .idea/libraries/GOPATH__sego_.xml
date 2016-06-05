@@ -1,0 +1,18 @@
+<component name="libraryTable">
+  <library name="GOPATH &lt;sego&gt;">
+    <CLASSES>
+      <root url="file://$USER_HOME$/Development/Go_Package/src/github.com" />
+      <root url="file://$PROJECT_DIR$/../../../MasterChief/Go/workspace/src/github.com" />
+      <root url="file://$USER_HOME$/Development/Go_Package/src/gopkg.in" />
+      <root url="file://$USER_HOME$/Development/Go_Package/src/golang.org" />
+      <root url="file://$PROJECT_DIR$/../../../MasterChief/Go/workspace/src/goTest" />
+      <root url="file://$PROJECT_DIR$/../../../MasterChief/Go/workspace/src/sego" />
+      <root url="file://$PROJECT_DIR$/../Feeling-KeywordFilter/src/data" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <excluded>
+      <root url="file://$PROJECT_DIR$" />
+    </excluded>
+  </library>
+</component>
