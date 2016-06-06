@@ -41,10 +41,12 @@ func (seg *Segmenter) Dictionary() *Dictionary {
 //
 // 词典的格式为（每个分词一行）：
 //	分词文本 频率 词性
-func (seg *Segmenter) LoadDictionary(files string) {
-	seg.dict = NewDictionary()
+func (seg *Segmenter) LoadDictionary(files string, needOutput bool) {
+	dict := NewDictionary()
 	for _, file := range strings.Split(files, ",") {
-		log.Printf("载入sego词典 %s", file)
+		if needOutput {
+			log.Printf("载入sego词典 %s", file)
+		}
 		dictFile, err := os.Open(file)
 		defer dictFile.Close()
 		if err != nil {
@@ -87,20 +89,20 @@ func (seg *Segmenter) LoadDictionary(files string) {
 			// 将分词添加到字典中
 			words := splitTextToWords([]byte(text))
 			token := Token{text: words, frequency: frequency, pos: pos}
-			seg.dict.addToken(token)
+			dict.addToken(token)
 		}
 	}
 
 	// 计算每个分词的路径值，路径值含义见Token结构体的注释
-	logTotalFrequency := float32(math.Log2(float64(seg.dict.totalFrequency)))
-	for i := range seg.dict.tokens {
-		token := &seg.dict.tokens[i]
+	logTotalFrequency := float32(math.Log2(float64(dict.totalFrequency)))
+	for i := range dict.tokens {
+		token := &dict.tokens[i]
 		token.distance = logTotalFrequency - float32(math.Log2(float64(token.frequency)))
 	}
 
 	// 对每个分词进行细致划分，用于搜索引擎模式，该模式用法见Token结构体的注释。
-	for i := range seg.dict.tokens {
-		token := &seg.dict.tokens[i]
+	for i := range dict.tokens {
+		token := &dict.tokens[i]
 		segments := seg.segmentWords(token.text, true)
 
 		// 计算需要添加的子分词数目
@@ -123,8 +125,10 @@ func (seg *Segmenter) LoadDictionary(files string) {
 			}
 		}
 	}
-
-	log.Println("sego词典载入完毕")
+	seg.dict = dict // 避免上面的逻辑有误,也会将现有的 dict 变成 newDictionary
+	if needOutput {
+		log.Println("sego词典载入完毕")
+	}
 }
 
 // 对文本分词
