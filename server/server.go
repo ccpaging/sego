@@ -29,7 +29,7 @@ import (
 	"io"
 	"net/http"
 	"runtime"
-	"github.com/huichen/sego"
+	"github.com/godblesshugh/sego"
 )
 
 var (

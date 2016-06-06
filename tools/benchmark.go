@@ -28,7 +28,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"github.com/huichen/sego"
+	"github.com/godblesshugh/sego"
 	"log"
 	"os"
 	"runtime"

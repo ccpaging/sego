@@ -14,15 +14,20 @@ import (
 //      "中华/nz 人民/n 共和/nz 共和国/ns 人民共和国/nt 中华人民共和国/ns "
 //
 // 搜索模式主要用于给搜索引擎提供尽可能多的关键字，详情请见Token结构体的注释。
-func SegmentsToString(segs []Segment, searchMode bool) (output string) {
+func SegmentsToString(segs []Segment, searchMode bool) (output string, maliciout int) {
 	if searchMode {
 		for _, seg := range segs {
+			maliciout += seg.token.frequency
 			output += tokenToString(seg.token)
 		}
 	} else {
 		for _, seg := range segs {
-			output += fmt.Sprintf(
-				"%s/%s ", textSliceToString(seg.token.text), seg.token.pos)
+			maliciout += seg.token.frequency
+			if seg.token.frequency > 0 {
+				output += fmt.Sprint(seg.token.pos)
+			} else {
+				output += fmt.Sprint(textSliceToString(seg.token.text))
+			}
 		}
 	}
 	return
@@ -32,7 +37,7 @@ func tokenToString(token *Token) (output string) {
 	for _, s := range token.segments {
 		output += tokenToString(s.token)
 	}
-	output += fmt.Sprintf("%s/%s ", textSliceToString(token.text), token.frequency)
+	output += fmt.Sprintf("%s/%s ", textSliceToString(token.text), token.pos)
 	return
 }
 
