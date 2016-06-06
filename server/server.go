@@ -77,7 +77,7 @@ func main() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 
 	// 初始化分词器
-	segmenter.LoadDictionary(*dict)
+	segmenter.LoadDictionary(*dict, true)
 
 	// 分词
 	text := []byte("加微信号要不要")
