@@ -11,8 +11,8 @@ var (
 
 func TestSegment(t *testing.T) {
 	var seg Segmenter
-	seg.LoadDictionary("testdata/test_dict2.txt", true)
-	segments := seg.Segment([]byte("中国有十三亿人口!!\n所以还不想挣钱吗?招兼职:123456"))
+	seg.LoadDictionary("testdata/test_dict2.txt", false)
+	segments := seg.Segment([]byte("中国有十三亿人口!!所以还不想挣钱吗?招兼职:123456"))
 	malicious := 0
 	for index := 0; index < len(segments); index++ {
 		malicious += segments[index].token.frequency
@@ -20,6 +20,19 @@ func TestSegment(t *testing.T) {
 	output, malicious := SegmentsToString(segments, false)
 	fmt.Println(output)
 	fmt.Println(malicious)
+	seg.LoadDictionary("testdata/test_dict3.txt", false)
+	segments = seg.Segment([]byte("中国有十三亿人口!!所以还不想挣钱吗?招兼职:123456"))
+	malicious = 0
+	for index := 0; index < len(segments); index++ {
+		malicious += segments[index].token.frequency
+	}
+	output, malicious = SegmentsToString(segments, false)
+	fmt.Println(output)
+	fmt.Println(malicious)
+}
+
+func test(a * int) {
+	*a = 12
 }
 //
 //func TestSplit(t *testing.T) {
