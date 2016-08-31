@@ -63,7 +63,9 @@ func tokenToSlice(token *Token) (output []string) {
 	for _, s := range token.segments {
 		output = append(output, tokenToSlice(s.token)...)
 	}
-	output = append(output, textSliceToString(token.text))
+	if token.pos != "x" {
+		output = append(output, textSliceToString(token.text))
+	}
 	return output
 }
 
