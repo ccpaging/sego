@@ -14,7 +14,7 @@ import (
 )
 
 const (
-	minTokenFrequency = 2 // 仅从字典文件中读取大于等于此频率的分词
+	minTokenFrequency = 0 // 仅从字典文件中读取大于等于此频率的分词
 )
 
 // 分词器结构体
@@ -41,16 +41,19 @@ func (seg *Segmenter) Dictionary() *Dictionary {
 //
 // 词典的格式为（每个分词一行）：
 //	分词文本 频率 词性
-func (seg *Segmenter) LoadDictionary(files string) {
-	seg.dict = NewDictionary()
+func (seg *Segmenter) LoadDictionary(files string, needOutput bool) {
+	var _seg Segmenter
+	_seg.dict = NewDictionary()
 	for _, file := range strings.Split(files, ",") {
-		log.Printf("载入sego词典 %s", file)
+		if needOutput {
+			log.Printf("载入sego词典 %s", file)
+		}
 		dictFile, err := os.Open(file)
 		defer dictFile.Close()
 		if err != nil {
-			log.Fatalf("无法载入字典文件 \"%s\" \n", file)
+			log.Printf("无法载入字典文件 \"%s\" \n", file) // 不需要停止程序
+			return
 		}
-
 		reader := bufio.NewReader(dictFile)
 		var text string
 		var freqText string
@@ -87,21 +90,21 @@ func (seg *Segmenter) LoadDictionary(files string) {
 			// 将分词添加到字典中
 			words := splitTextToWords([]byte(text))
 			token := Token{text: words, frequency: frequency, pos: pos}
-			seg.dict.addToken(token)
+			_seg.dict.addToken(token)
 		}
 	}
 
 	// 计算每个分词的路径值，路径值含义见Token结构体的注释
-	logTotalFrequency := float32(math.Log2(float64(seg.dict.totalFrequency)))
-	for i := range seg.dict.tokens {
-		token := &seg.dict.tokens[i]
+	logTotalFrequency := float32(math.Log2(float64(_seg.dict.totalFrequency)))
+	for i := range _seg.dict.tokens {
+		token := &_seg.dict.tokens[i]
 		token.distance = logTotalFrequency - float32(math.Log2(float64(token.frequency)))
 	}
 
 	// 对每个分词进行细致划分，用于搜索引擎模式，该模式用法见Token结构体的注释。
-	for i := range seg.dict.tokens {
-		token := &seg.dict.tokens[i]
-		segments := seg.segmentWords(token.text, true)
+	for i := range _seg.dict.tokens {
+		token := &_seg.dict.tokens[i]
+		segments := _seg.segmentWords(token.text, true)
 
 		// 计算需要添加的子分词数目
 		numTokensToAdd := 0
@@ -123,8 +126,10 @@ func (seg *Segmenter) LoadDictionary(files string) {
 			}
 		}
 	}
-
-	log.Println("sego词典载入完毕")
+	seg.dict = _seg.dict
+	if needOutput {
+		log.Println("sego词典载入完毕")
+	}
 }
 
 // 对文本分词
@@ -186,7 +191,7 @@ func (seg *Segmenter) segmentWords(text []Text, searchMode bool) []Segment {
 		// 当前字元没有对应分词时补加一个伪分词
 		if numTokens == 0 || len(tokens[0].text) > 1 {
 			updateJumper(&jumpers[current], baseDistance,
-				&Token{text: []Text{text[current]}, frequency: 1, distance: 32, pos: "x"})
+				&Token{text: []Text{text[current]}, frequency: 0, distance: 32})
 		}
 	}
 
